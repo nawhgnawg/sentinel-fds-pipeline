@@ -49,8 +49,6 @@ public class TransactionSimulator {
                 .patternDescription("NORMAL_TRANSACTION")
                 .build();
 
-
-
         // Kafka 전송
         producerService.sendTransactionEvent(normal);
     }
@@ -63,7 +61,8 @@ public class TransactionSimulator {
                 .userId("victim_kim")
                 .type(TransactionType.TRANSFER)
                 .amount(9500000) // 지연 인출 제도를 피하기 위한 1천만 원 미만 쪼개기 송금
-                .clientIp("210.123.45." + random.nextInt(254))
+//                .clientIp("210.123.45." + random.nextInt(254))
+                .clientIp("210.123.45." + "1")
                 .deviceOs("Android")
                 .location("Busan, South Korea")
                 .timestamp(Instant.now().toString())
@@ -81,7 +80,8 @@ public class TransactionSimulator {
                 .userId("user_lee")
                 .type(TransactionType.TRANSFER)
                 .amount(45000000) // 4500만 원 거액 이체
-                .clientIp("185.220.101." + random.nextInt(254)) // 익명화 노드 토르 IP 대역 시뮬레이션
+//                .clientIp("185.220.101." + random.nextInt(254)) // 익명화 노드 토르 IP 대역 시뮬레이션
+                .clientIp("185.220.101." + "1")
                 .deviceOs("Windows_Unknown")
                 .location("Lagos, Nigeria")
                 .timestamp(Instant.now().toString())
