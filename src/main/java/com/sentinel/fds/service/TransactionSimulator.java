@@ -49,6 +49,8 @@ public class TransactionSimulator {
                 .patternDescription("NORMAL_TRANSACTION")
                 .build();
 
+
+
         // Kafka 전송
         producerService.sendTransactionEvent(normal);
     }

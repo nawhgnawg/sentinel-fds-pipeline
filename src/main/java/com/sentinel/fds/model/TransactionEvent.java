@@ -1,11 +1,16 @@
 package com.sentinel.fds.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
 @Data
 @Builder
+@NoArgsConstructor  // 🌟 핵심 해결책: 비어있는 기본 생성자를 만들어 줍니다!
+@AllArgsConstructor // (Builder를 쓴다면 짝꿍으로 같이 넣어주세요)
 public class TransactionEvent {
     private String eventId;          // 이벤트 고유 ID
     private String accountNumber;     // 고객 계좌 번호
