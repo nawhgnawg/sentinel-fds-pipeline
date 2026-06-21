@@ -48,9 +48,14 @@ services:
       - elasticsearch
       - kafka
 
-
   # 6. 초고속 인메모리 DB (Redis) - 단기 기억 상실 방지용!
   redis:
     image: redis:7.2
     ports:
       - "6379:6379"
+
+  # 7. AI 이상 탐지 서버 (Python FastAPI)
+  ml-api:
+    build: ./ml-api
+    ports:
+      - "8000:8000"
