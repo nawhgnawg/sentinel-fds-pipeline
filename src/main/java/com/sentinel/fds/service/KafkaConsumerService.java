@@ -29,6 +29,7 @@ public class KafkaConsumerService {
     // 파이썬 머신러닝 서버 주소 (도커 내부 통신이 아닌 로컬 통신 기준)
     private final String ML_API_URL = "http://localhost:8000/predict";
 
+    // "financial-transactions" 우체통을 실시간으로 감시하는 리스너
     @KafkaListener(topics = "financial-transactions", groupId = "fds-alert-group")
     public void consumeTransactionEvent(String message) {
         try {

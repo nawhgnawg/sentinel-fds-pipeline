@@ -4,13 +4,19 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true  # (기존 false를 true로 변경하여 자물쇠 켜기)
+      - xpack.security.http.ssl.enabled=false
+      - ELASTIC_PASSWORD=Sentinel123! # (최고 관리자 'elastic' 계정의 비밀번호 설정)
     ports:
       - "9200:9200"
 
   # 2. 시각화 모니터 (Kibana)
   kibana:
     image: docker.elastic.co/kibana/kibana:8.10.2
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=KibanaPassword123!
     ports:
       - "5601:5601"
     depends_on:
@@ -33,11 +39,20 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       # 내부망(29092)과 외부망(9092) 리스너 분리
+      # 🌟 1. EXTERNAL(외부망) 통신에 SASL_PLAINTEXT 자물쇠를 채웁니다.
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      # 🌟 2. SASL/PLAIN 인증 방식을 활성화합니다.
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+#      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      # 🌟 3. 카프카가 방금 우리가 만든 명부 파일을 읽도록 옵션을 줍니다.
+      # 🌟 오직 카프카 서버 본체에만 명부를 적용하는 전용 변수입니다.
+      KAFKA_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"admin-secret\" user_admin=\"admin-secret\" user_spring=\"spring-secret\";"
+      # 🌟 책갈피 복사본을 1개만 만들도록 허용
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
 
   # 5. 데이터 분류/정제 센터 (Logstash)
   logstash:
