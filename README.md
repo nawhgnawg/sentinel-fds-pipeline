@@ -18,3 +18,6 @@
 **1. 인프라 실행 (Kafka & Zookeeper)**
 ```bash
 docker-compose up -d
+```
+
+![FDS 아키텍처 다이어그램](./images/diagram.jpg)
