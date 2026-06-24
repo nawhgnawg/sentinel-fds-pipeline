@@ -30,48 +30,48 @@ public class KafkaConsumerService {
     private final String ML_API_URL = "http://localhost:8000/predict";
 
     // "financial-transactions" 우체통을 실시간으로 감시하는 리스너
-    @KafkaListener(topics = "financial-transactions", groupId = "fds-alert-group")
-    public void consumeTransactionEvent(String message) {
-        try {
-            TransactionEvent event = objectMapper.readValue(message, TransactionEvent.class);
-
-            // 1. Python AI 서버에 보낼 준비
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<TransactionEvent> requestEntity = new HttpEntity<>(event, headers);
-
-            // 2. AI 서버에 판별 요청 (HTTP POST)
-            String response = restTemplate.postForObject(ML_API_URL, requestEntity, String.class);
-
-            // 3. AI 서버의 응답(JSON) 해석하기
-            // readTree() - 클래스를 따로 만들 필요가 없습니다. JSON에서 내가 필요한 특정 필드 몇 개만 쏙쏙 골라낼 때 압도적으로 편리
-            // .get("필드명")으로 값을 꺼냄
-            JsonNode responseNode = objectMapper.readTree(response);
-            boolean isFraud = responseNode.get("is_fraud").asBoolean();
-            double probability = responseNode.get("fraud_probability").asDouble();
-
-            // 4. AI가 '사기(True)'라고 확신했다면 알림 발송!
-            if (isFraud) {
-                String alertMessage = String.format(
-                        "🤖 **[AI 보안 경보] 머신러닝 이상 탐지!** 🤖\n" +
-                                "▶ **AI 확신도:** `%.0f%%` (사기 확률)\n" +
-                                "▶ **공격 IP:** `%s`\n" +
-                                "▶ **발생 금액:** `%d 원`\n" +
-                                "▶ **의심 패턴:** `%s`",
-                        probability * 100,
-                        event.getClientIp(),
-                        event.getAmount(),
-                        event.getPatternDescription()
-                );
-
-                log.warn("🤖 AI 사기 판별 완료 (확률: {}%) - IP: {}", probability * 100, event.getClientIp());
-                discordNotificationService.sendAlert(alertMessage);
-            }
-
-        } catch (Exception e) {
-            log.error("AI 서버 통신 및 메시지 처리 중 에러 발생: {}", e.getMessage());
-        }
-    }
+//    @KafkaListener(topics = "financial-transactions", groupId = "fds-alert-group")
+//    public void consumeTransactionEvent(String message) {
+//        try {
+//            TransactionEvent event = objectMapper.readValue(message, TransactionEvent.class);
+//
+//            // 1. Python AI 서버에 보낼 준비
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//            HttpEntity<TransactionEvent> requestEntity = new HttpEntity<>(event, headers);
+//
+//            // 2. AI 서버에 판별 요청 (HTTP POST)
+//            String response = restTemplate.postForObject(ML_API_URL, requestEntity, String.class);
+//
+//            // 3. AI 서버의 응답(JSON) 해석하기
+//            // readTree() - 클래스를 따로 만들 필요가 없습니다. JSON에서 내가 필요한 특정 필드 몇 개만 쏙쏙 골라낼 때 압도적으로 편리
+//            // .get("필드명")으로 값을 꺼냄
+//            JsonNode responseNode = objectMapper.readTree(response);
+//            boolean isFraud = responseNode.get("is_fraud").asBoolean();
+//            double probability = responseNode.get("fraud_probability").asDouble();
+//
+//            // 4. AI가 '사기(True)'라고 확신했다면 알림 발송!
+//            if (isFraud) {
+//                String alertMessage = String.format(
+//                        "🤖 **[AI 보안 경보] 머신러닝 이상 탐지!** 🤖\n" +
+//                                "▶ **AI 확신도:** `%.0f%%` (사기 확률)\n" +
+//                                "▶ **공격 IP:** `%s`\n" +
+//                                "▶ **발생 금액:** `%d 원`\n" +
+//                                "▶ **의심 패턴:** `%s`",
+//                        probability * 100,
+//                        event.getClientIp(),
+//                        event.getAmount(),
+//                        event.getPatternDescription()
+//                );
+//
+//                log.warn("🤖 AI 사기 판별 완료 (확률: {}%) - IP: {}", probability * 100, event.getClientIp());
+//                discordNotificationService.sendAlert(alertMessage);
+//            }
+//
+//        } catch (Exception e) {
+//            log.error("AI 서버 통신 및 메시지 처리 중 에러 발생: {}", e.getMessage());
+//        }
+//    }
 
 
     /**
